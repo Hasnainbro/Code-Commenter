@@ -13,6 +13,7 @@ An interactive web application that uses OpenRouter's AI to dynamically add, rem
 ---
 
 ## 🛠️ **Project Structure**
+```
 📂 code-commenting-tool
 ├── 📜 app.py                 # Flask backend with OpenRouter API integration
 ├── 📜 requirements.txt       # Python dependencies
@@ -25,6 +26,7 @@ An interactive web application that uses OpenRouter's AI to dynamically add, rem
 └── 📂 templates              # HTML templates for the frontend
     ├── 📜 index.html         # Main HTML page with input/output boxes
 
+```
 ---
 
 ## 📜 **Prerequisites**
