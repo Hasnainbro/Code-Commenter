@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Code Tool</h1>
+    <div class="container">
+        <textarea id="code-input" placeholder="Enter code here"></textarea>
+        <div class="button-container">
+            <button id="removeButton" onclick="removeComments()">Remove Comments</button>
+            <button id="addButton" onclick="addComments()">Add Comments</button>
+        </div>
+        <div id="loading">
+            <div class="loader"></div> Generating..
+        </div>
+        <pre id="resultContainer"></pre>
+    </div>
+
+    <script>
+        function displayCodeOutput(data, resultContainer) {
+            resultContainer.innerHTML = ''; // Clear existing content
+    
+            // Create container for output and copy button
+            const outputContainer = document.createElement("div");
+            outputContainer.className = "output-container";
+    
+            // Create Copy Button
+            const copyButton = document.createElement("button");
+            copyButton.className = "copy-button";
+            copyButton.textContent = "Copy";
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(data).then(() => {
+                    copyButton.textContent = "Copied!";
+                    setTimeout(() => (copyButton.textContent = "Copy"), 1500);
+                }).catch(err => {
+                    alert("Failed to copy text");
+                    console.error(err);
+                });
+            };
+    
+            // Create code block
+            const codeBlock = document.createElement("pre");
+            codeBlock.className = "code-output";
+            codeBlock.textContent = data;
+    
+            // Append copy button first, then the code block
+            outputContainer.appendChild(copyButton);
+            outputContainer.appendChild(codeBlock);
+    
+            // Append to result container
+            resultContainer.appendChild(outputContainer);
+        }
+    
+        function addComments() {
+            const codeInput = document.getElementById('code-input').value;
+            const resultContainer = document.getElementById('resultContainer');
+            const loadingDiv = document.getElementById('loading');
+            resultContainer.innerHTML = '';
+            loadingDiv.style.display = "block";
+            fetch('/comment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: codeInput
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingDiv.style.display = "none";
+                if (data.error) {
+                    resultContainer.innerHTML = `<p class="error">Error: ${data.error} ${data.details ? ' - ' + data.details : ''}</p>`;
+                } else {
+                    displayCodeOutput(data.commented_code, resultContainer);
+                }
+            })
+            .catch(error => {
+                loadingDiv.style.display = "none";
+                resultContainer.innerHTML = `<p class="error">Error: Failed to process code. Please try again.</p>`;
+                console.error('Error processing code:', error);
+            });
+        }
+    </script>
+    
+    
+</body>
+</html>
